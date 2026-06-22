@@ -61,6 +61,35 @@ let webpackConfig = {
 };
 
 webpackConfig.devServer = (devServerConfig) => {
+  // Compat: webpack-dev-server v5 removed onBeforeSetupMiddleware / onAfterSetupMiddleware
+  // react-scripts 5.0.1 still emits them, so consolidate into setupMiddlewares.
+  const onBefore = devServerConfig.onBeforeSetupMiddleware;
+  const onAfter = devServerConfig.onAfterSetupMiddleware;
+  if (onBefore || onAfter) {
+    delete devServerConfig.onBeforeSetupMiddleware;
+    delete devServerConfig.onAfterSetupMiddleware;
+    const originalSetupMiddlewares = devServerConfig.setupMiddlewares;
+    devServerConfig.setupMiddlewares = (middlewares, devServer) => {
+      if (typeof onBefore === "function") onBefore(devServer);
+      const out = typeof originalSetupMiddlewares === "function"
+        ? originalSetupMiddlewares(middlewares, devServer)
+        : middlewares;
+      if (typeof onAfter === "function") onAfter(devServer);
+      return out;
+    };
+  }
+
+  // Compat: webpack-dev-server v5 replaced `https` with `server: { type: 'https' }`.
+  if (typeof devServerConfig.https !== "undefined") {
+    const httpsOpt = devServerConfig.https;
+    delete devServerConfig.https;
+    if (httpsOpt) {
+      devServerConfig.server = httpsOpt === true
+        ? "https"
+        : { type: "https", options: httpsOpt };
+    }
+  }
+
   // Add health check endpoints if enabled
   if (config.enableHealthCheck && setupHealthEndpoints && healthPluginInstance) {
     const originalSetupMiddlewares = devServerConfig.setupMiddlewares;
