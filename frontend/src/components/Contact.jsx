@@ -124,6 +124,7 @@ export const Contact = () => {
                     {/* Form */}
                     <motion.form
                         onSubmit={handleSubmit}
+                        noValidate
                         initial={{ opacity: 0, y: 40 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
@@ -144,7 +145,6 @@ export const Contact = () => {
                                     placeholder="Your name"
                                     className={inputBase}
                                     data-testid="contact-input-name"
-                                    required
                                 />
                             </div>
                             <div className="col-span-2 md:col-span-1">
@@ -159,7 +159,6 @@ export const Contact = () => {
                                     placeholder="you@studio.com"
                                     className={inputBase}
                                     data-testid="contact-input-email"
-                                    required
                                 />
                             </div>
                             <div className="col-span-2 md:col-span-1">
@@ -206,7 +205,6 @@ export const Contact = () => {
                                     rows={6}
                                     className={inputBase + " resize-none"}
                                     data-testid="contact-input-message"
-                                    required
                                 />
                             </div>
                         </div>
