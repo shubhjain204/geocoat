@@ -1,11 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import axios from "axios";
 import { toast } from "sonner";
 import { Send, Loader2 } from "lucide-react";
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
 
 const projectTypes = [
     "Heritage / Restoration",
@@ -14,6 +10,12 @@ const projectTypes = [
     "Institutional",
     "Other",
 ];
+
+const encodeForm = (data) =>
+    new URLSearchParams({
+        "form-name": "contact",
+        ...data,
+    }).toString();
 
 export const Contact = () => {
     const [form, setForm] = useState({
@@ -38,7 +40,11 @@ export const Contact = () => {
         }
         setLoading(true);
         try {
-            await axios.post(`${API}/contact`, form);
+            await fetch("/", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: encodeForm(form),
+            });
             toast.success("Thank you. A GeoCoat specialist will be in touch within 24 hours.");
             setForm({
                 name: "",
@@ -49,9 +55,7 @@ export const Contact = () => {
             });
         } catch (err) {
             toast.error(
-                err?.response?.data?.detail?.[0]?.msg ||
-                    err?.response?.data?.detail ||
-                    "Could not send your message. Please try again."
+                "Could not send your message. Please try again or email us directly."
             );
         } finally {
             setLoading(false);
@@ -115,7 +119,7 @@ export const Contact = () => {
                                     Atelier
                                 </div>
                                 <div className="font-heading text-xl text-[#F5F5F0] font-light leading-snug">
-                                    Bangalore · Mumbai · Lisbon
+                                    Bangalore, Mumbai, Lisbon
                                 </div>
                             </div>
                         </div>
@@ -125,6 +129,9 @@ export const Contact = () => {
                     <motion.form
                         onSubmit={handleSubmit}
                         noValidate
+                        name="contact"
+                        method="POST"
+                        data-netlify="true"
                         initial={{ opacity: 0, y: 40 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
@@ -132,6 +139,7 @@ export const Contact = () => {
                         className="col-span-12 lg:col-span-7 bg-[#F5F5F0] text-[#1A1A1A] p-8 md:p-12 rounded-sm"
                         data-testid="contact-form"
                     >
+                        <input type="hidden" name="form-name" value="contact" />
                         <div className="grid grid-cols-2 gap-5">
                             <div className="col-span-2 md:col-span-1">
                                 <label className="text-xs uppercase tracking-[0.25em] text-[#5B7059] mb-2 block">
