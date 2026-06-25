@@ -2,13 +2,12 @@
 
 GeoCoat is a static React landing page.
 
-## Deploy on Netlify
+## Deploy on Vercel
 
-1. Import this GitHub repo in Netlify.
-2. Netlify will read `netlify.toml` and use:
-   - Base directory: `frontend`
-   - Build command: `npm run build`
-   - Publish directory: `frontend/build`
-3. After the first deploy, open Netlify Forms in the site dashboard and enable email notifications for the `contact` form.
+1. Import this GitHub repo in Vercel.
+2. Vercel will read `vercel.json` and use:
+   - Install command: `cd frontend && npm install --legacy-peer-deps`
+   - Build command: `cd frontend && npm run build`
+   - Output directory: `frontend/build`
 
 No Python backend or MongoDB database is required for the landing page.

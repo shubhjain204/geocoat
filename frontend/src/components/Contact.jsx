@@ -3,6 +3,8 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { Send, Loader2 } from "lucide-react";
 
+const CONTACT_EMAIL = "studio@geocoat.example";
+
 const projectTypes = [
     "Heritage / Restoration",
     "Residential",
@@ -10,12 +12,6 @@ const projectTypes = [
     "Institutional",
     "Other",
 ];
-
-const encodeForm = (data) =>
-    new URLSearchParams({
-        "form-name": "contact",
-        ...data,
-    }).toString();
 
 export const Contact = () => {
     const [form, setForm] = useState({
@@ -40,12 +36,23 @@ export const Contact = () => {
         }
         setLoading(true);
         try {
-            await fetch("/", {
-                method: "POST",
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: encodeForm(form),
-            });
-            toast.success("Thank you. A GeoCoat specialist will be in touch within 24 hours.");
+            const body = [
+                `Name: ${form.name}`,
+                `Email: ${form.email}`,
+                form.phone ? `Phone: ${form.phone}` : null,
+                `Project type: ${form.project_type}`,
+                "",
+                form.message,
+            ]
+                .filter(Boolean)
+                .join("\n");
+
+            const mailto = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
+                `GeoCoat enquiry - ${form.project_type}`
+            )}&body=${encodeURIComponent(body)}`;
+
+            window.location.href = mailto;
+            toast.success("Your email app should open with the project details ready to send.");
             setForm({
                 name: "",
                 email: "",
@@ -55,7 +62,7 @@ export const Contact = () => {
             });
         } catch (err) {
             toast.error(
-                "Could not send your message. Please try again or email us directly."
+                "Could not open your email app. Please email us directly."
             );
         } finally {
             setLoading(false);
@@ -103,7 +110,7 @@ export const Contact = () => {
                                     Studio
                                 </div>
                                 <div className="font-heading text-xl text-[#F5F5F0] font-light">
-                                    studio@geocoat.example
+                                    {CONTACT_EMAIL}
                                 </div>
                             </div>
                             <div>
@@ -131,7 +138,6 @@ export const Contact = () => {
                         noValidate
                         name="contact"
                         method="POST"
-                        data-netlify="true"
                         initial={{ opacity: 0, y: 40 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
@@ -139,7 +145,6 @@ export const Contact = () => {
                         className="col-span-12 lg:col-span-7 bg-[#F5F5F0] text-[#1A1A1A] p-8 md:p-12 rounded-sm"
                         data-testid="contact-form"
                     >
-                        <input type="hidden" name="form-name" value="contact" />
                         <div className="grid grid-cols-2 gap-5">
                             <div className="col-span-2 md:col-span-1">
                                 <label className="text-xs uppercase tracking-[0.25em] text-[#5B7059] mb-2 block">
